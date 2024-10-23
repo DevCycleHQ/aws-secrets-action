@@ -24,7 +24,7 @@ runs:
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: arn:aws:iam::${{inputs.aws_account_id}}:role/${{inputs.role_prefix}}-${{ github.event.repository.name }}
-        aws-region: ${{ input.aws_region }}
+        aws-region: ${{ inputs.aws_region }}
     - name: Set Secrets
       shell: bash
       run: |
