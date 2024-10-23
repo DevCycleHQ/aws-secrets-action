@@ -8,7 +8,7 @@ inputs:
   role_prefix:
     description: 'The prefix of the role to assume in the target AWS account'
     required: true
-    default: 'GitHub-Actions-'
+    default: 'GitHub-Actions'
   aws_region:
     description: 'The AWS region where the secrets are stored'
     required: true
