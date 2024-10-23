@@ -28,7 +28,7 @@ runs:
     - name: Set Secrets
       shell: bash
       run: |
-        echo "${{ inputs.secrets_map }}" | jq -r 'to_entries[] | "\(.key) \(.value)"' | while IFS=' ' read -r key value; do
+        echo '${{ inputs.secrets_map }}' | jq -r 'to_entries[] | "\(.key) \(.value)"' | while IFS=' ' read -r key value; do
           secret_value=$(aws secretsmanager get-secret-value --secret-id "$value" --query SecretString --output text)    
           echo "::add-mask::$secret_value"
           echo "$key=$secret_value" >> $GITHUB_ENV
