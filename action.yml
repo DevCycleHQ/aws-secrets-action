@@ -28,12 +28,8 @@ runs:
     - name: Set Secrets
       shell: bash
       run: |
-        echo "${{ inputs.secrets_map }}" > secrets_map.json
-        export $(jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" secrets_map.json)
-        for key in $(jq -r 'keys[]' secrets_map.json); do
-          secret_name=$(jq -r --arg key "$key" '.[$key]' secrets_map.json)
-          secret_value=$(aws secretsmanager get-secret-value --secret-id "${{ secrets[secret_name] }}" --query SecretString --output text)        
-          echo "::add-mask::$(aws secretsmanager get-secret-value --secret-id "${{ secrets[secret_name] }}" --query SecretString --output text)"
+        echo "${{ inputs.secrets_map }}" | jq -r 'to_entries[] | "\(.key) \(.value)"' | while IFS=' ' read -r key value; do
+          secret_value=$(aws secretsmanager get-secret-value --secret-id "$value" --query SecretString --output text)    
+          echo "::add-mask::$secret_value"
           echo "$key=$secret_value" >> $GITHUB_ENV
         done
-        rm secrets_map.json
