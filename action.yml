@@ -16,7 +16,6 @@ inputs:
   aws_account_id:
     description: 'The AWS account ID where the secrets are stored'
     required: true
-    default: '134377926370'
 
 runs:
   using: 'composite'
