@@ -5,6 +5,18 @@ inputs:
   secrets_map:
     description: 'A JSON object of environment variables mapped to AWS Secrets Manager secret names'
     required: true
+  role_prefix:
+    description: 'The prefix of the role to assume in the target AWS account'
+    required: true
+    default: 'GitHub-Actions-'
+  aws_region:
+    description: 'The AWS region where the secrets are stored'
+    required: true
+    default: 'us-east-1'
+  aws_account_id:
+    description: 'The AWS account ID where the secrets are stored'
+    required: true
+    default: '134377926370'
 
 runs:
   using: 'composite'
@@ -12,8 +24,8 @@ runs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::134377926370:role/GitHub-Actions-${{ github.event.repository.name }}
-        aws-region: us-east-1
+        role-to-assume: arn:aws:iam::${{inputs.aws_account_id}}:role/${{inputs.role_prefix}}-${{ github.event.repository.name }}
+        aws-region: ${{ input.aws_region }}
     - name: Set Secrets
       shell: bash
       run: |
