@@ -1,0 +1,28 @@
+name: 'DevCycle Secrets Manager'
+description: 'Set GitHub Secrets securely from AWS Secrets Manager'
+
+inputs:
+  secrets_map:
+    description: 'A JSON object of environment variables mapped to AWS Secrets Manager secret names'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::134377926370:role/GitHub-Actions-${{ github.event.repository.name }}
+        aws-region: us-east-1
+    - name: Set Secrets
+      shell: bash
+      run: |
+        echo "${{ inputs.secrets_map }}" > secrets_map.json
+        export $(jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" secrets_map.json)
+        for key in $(jq -r 'keys[]' secrets_map.json); do
+          secret_name=$(jq -r --arg key "$key" '.[$key]' secrets_map.json)
+          secret_value=$(aws secretsmanager get-secret-value --secret-id "${{ secrets[secret_name] }}" --query SecretString --output text)        
+          echo "::add-mask::$(aws secretsmanager get-secret-value --secret-id "${{ secrets[secret_name] }}" --query SecretString --output text)"
+          echo "$key=$secret_value" >> $GITHUB_ENV
+        done
+        rm secrets_map.json
