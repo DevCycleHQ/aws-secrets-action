@@ -1,0 +1,8 @@
+# CODEOWNERS file
+# This file defines code ownership for the repository
+# All PRs require approval from the engineering team
+
+
+
+# Global rule - require engineering approval for all files
+* @devcyclehq/foundation
